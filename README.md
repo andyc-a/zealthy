@@ -1,57 +1,88 @@
-Backend (server.js + api/ + utils/):
+# Zealthy Mini EMR
 
-MySQL via mysql2 with connection pool
-db/schema.sql — creates users, appointments, prescriptions, medications, dosages tables
-db/seed.js — runs schema + seeds from data.json (bcrypt-hashed passwords, idempotent)
-api/auth.js — JWT login/me endpoints
-api/patients.js — patient CRUD
-api/appointments.js / api/prescriptions.js — full CRUD
-api/me.js — patient portal endpoints (/api/me/dashboard, /api/me/appointments, /api/me/prescriptions)
-api/meta.js — /api/medications, /api/dosages
-utils/recurring.js — expands recurring appointments (weekly/monthly) within a date range
-Frontend (src/ — React + TypeScript + Tailwind):
+A mini electronic medical records (EMR) system with a patient portal and admin interface.
 
-Patient Portal (/) — Login → Dashboard → Appointments / Prescriptions
-Admin EMR (/admin) — patient table, patient detail, all CRUD forms
-Teal/emerald color scheme, clean card-based UI
-To run:
+## Stack
 
-1. Configure database credentials in .env:
+| Layer | Tech |
+|---|---|
+| Frontend | React 18 + TypeScript + Tailwind CSS + Vite |
+| Backend | Express.js + mysql2 + JWT auth (bcryptjs) |
+| Database | MySQL |
 
+## Getting Started
+
+### 1. Configure environment
+
+Copy `.env.example` to `.env` and fill in your database credentials:
+
+```env
 DB_HOST=localhost
-DB_PASSWORD=your_mysql_password 2. Seed the database:
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=zealthy_emr
+JWT_SECRET=your_secret
+```
 
-npm run seed 3. Start development (backend + frontend):
+### 2. Start the database
 
-npm run dev
-Frontend: http://localhost:5173
-Backend API: http://localhost:3001
-Login credentials (from data.json):
+```bash
+npm run db:up
+```
 
-mark@some-email-provider.net / Password123!
-lisa@some-email-provider.net / Password123!
-Admin: http://localhost:5173/admin (no auth)
+### 3. Seed the database
 
-Quick start:
-
-# 1. Set your MySQL password in .env
-
-# DB_PASSWORD=your_password
-
-# 2. Seed the database
-
+```bash
 npm run seed
+```
 
-# 3. Run dev (backend on :3001, frontend on :5173)
+### 4. Start development
 
+```bash
 npm run dev
-What was built:
+```
 
-Layer Stack
-Frontend React 18 + TypeScript + Tailwind CSS + Vite
-Backend Express.js + mysql2 + JWT auth (bcryptjs)
-Database MySQL with schema auto-created by seed script
-Routes:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
 
-/ — Patient login → dashboard, appointments, prescriptions
-/admin — Admin EMR: patient list, detail, full CRUD for patients/appointments/prescriptions
+## Login Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Patient | mark@some-email-provider.net | Password123! |
+| Patient | lisa@some-email-provider.net | Password123! |
+| Admin | http://localhost:5173/admin | _(no auth)_ |
+
+## Routes
+
+| Route | Description |
+|---|---|
+| `/` | Patient login → dashboard, appointments, prescriptions |
+| `/admin` | Admin EMR: patient list, detail, full CRUD |
+
+## Project Structure
+
+```
+api/
+  auth.js          # JWT login endpoint
+  me.js            # Patient portal endpoints (/api/me/dashboard, appointments, prescriptions)
+  patients.js      # Patient CRUD
+  appointments.js  # Appointment CRUD
+  prescriptions.js # Prescription CRUD
+  meta.js          # /api/medications, /api/dosages
+db/
+  schema.sql       # Creates all tables
+  seed.js          # Runs schema + seeds from data.json
+utils/
+  db.js            # MySQL connection pool
+  recurring.js     # Expands recurring appointments within a date range
+src/               # React + TypeScript frontend
+```
+
+## Deployment (Railway)
+
+1. Create a MySQL service in Railway and copy the connection variables into your app service as `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+2. Set `NODE_ENV=production` and a secure `JWT_SECRET`
+3. Set build command to `npm run build`, start command to `npm start`
+4. Run `npm run seed` from the Railway shell after first deploy
