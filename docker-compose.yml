@@ -1,0 +1,20 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: zealthy_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: zealthy
+      MYSQL_DATABASE: zealthy_emr
+    ports:
+      - "3306:3306"
+    volumes:
+      - zealthy_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pzealthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  zealthy_db_data:
