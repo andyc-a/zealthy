@@ -71,6 +71,13 @@ api/
   appointments.js  # Appointment CRUD
   prescriptions.js # Prescription CRUD
   meta.js          # /api/medications, /api/dosages
+services/
+  auth.service.js          # login, getMe, verifyToken
+  patients.service.js      # listPatients, getPatient, createPatient, updatePatient
+  appointments.service.js  # getAppointments, createAppointment, updateAppointment, deleteAppointment
+  prescriptions.service.js # getPrescriptions, createPrescription, updatePrescription, deletePrescription
+  me.service.js            # getDashboard, getAppointments, getPrescriptions
+  meta.service.js          # getMedications, getDosages
 db/
   schema.sql       # Creates all tables
   seed.js          # Runs schema + seeds from data.json
