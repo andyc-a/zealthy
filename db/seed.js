@@ -1,3 +1,6 @@
+// Seed is run automatically on every deploy via `npm start` (see package.json).
+// This is a workaround for Railway's internal DB host (mysql.railway.internal) not being
+// reachable from the Railway shell, so seeding manually isn't possible.
 import 'dotenv/config';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
