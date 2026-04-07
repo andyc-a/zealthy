@@ -1,12 +1,12 @@
 import express from 'express';
-import pool from '../utils/db.js';
+import * as prescriptionsService from '../services/prescriptions.service.js';
 
 const router = express.Router();
 
 // GET /api/patients/:id/prescriptions
 router.get('/:id/prescriptions', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM prescriptions WHERE user_id = ? ORDER BY refill_on', [req.params.id]);
+    const rows = await prescriptionsService.getPrescriptions(req.params.id);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -15,13 +15,9 @@ router.get('/:id/prescriptions', async (req, res) => {
 
 // POST /api/patients/:id/prescriptions
 router.post('/:id/prescriptions', async (req, res) => {
-  const { medication, dosage, quantity, refill_on, refill_schedule } = req.body;
   try {
-    const [result] = await pool.query(
-      'INSERT INTO prescriptions (user_id, medication, dosage, quantity, refill_on, refill_schedule) VALUES (?, ?, ?, ?, ?, ?)',
-      [req.params.id, medication, dosage, quantity || 1, refill_on, refill_schedule || 'monthly']
-    );
-    res.status(201).json({ id: result.insertId, user_id: parseInt(req.params.id), medication, dosage, quantity, refill_on, refill_schedule });
+    const rx = await prescriptionsService.createPrescription(req.params.id, req.body);
+    res.status(201).json(rx);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -29,13 +25,9 @@ router.post('/:id/prescriptions', async (req, res) => {
 
 // PUT /api/patients/:id/prescriptions/:rxId
 router.put('/:id/prescriptions/:rxId', async (req, res) => {
-  const { medication, dosage, quantity, refill_on, refill_schedule } = req.body;
   try {
-    await pool.query(
-      'UPDATE prescriptions SET medication = ?, dosage = ?, quantity = ?, refill_on = ?, refill_schedule = ? WHERE id = ? AND user_id = ?',
-      [medication, dosage, quantity, refill_on, refill_schedule, req.params.rxId, req.params.id]
-    );
-    res.json({ id: parseInt(req.params.rxId), medication, dosage, quantity, refill_on, refill_schedule });
+    const rx = await prescriptionsService.updatePrescription(req.params.id, req.params.rxId, req.body);
+    res.json(rx);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -44,7 +36,7 @@ router.put('/:id/prescriptions/:rxId', async (req, res) => {
 // DELETE /api/patients/:id/prescriptions/:rxId
 router.delete('/:id/prescriptions/:rxId', async (req, res) => {
   try {
-    await pool.query('DELETE FROM prescriptions WHERE id = ? AND user_id = ?', [req.params.rxId, req.params.id]);
+    await prescriptionsService.deletePrescription(req.params.id, req.params.rxId);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
