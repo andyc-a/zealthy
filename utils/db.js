@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import mysql from 'mysql2/promise';
 
+console.log('DB_HOST:', process.env.DB_HOST);
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3306'),
